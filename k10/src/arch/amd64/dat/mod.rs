@@ -1,3 +1,4 @@
+use crate::KSYS;
 use crate::taslock::Lock;
 use core::ptr;
 
@@ -11,13 +12,13 @@ pub type Pte = usize;
  * the clock which is only maintained by the bootstrap processor (0).
  */
 #[no_mangle]
-pub static mut m_ptr: *mut Mach = ptr::null_mut();
+pub static mut m_ptr: *mut Mach = (KSYS+ MACHSTKSZ+(1+1+1+4+1+192)*PTSZ+PGSZ) as *mut Mach ; //ptr::null_mut();
 
 #[no_mangle]
 pub static mut up_ptr: *mut Proc = ptr::null_mut();
 
 #[no_mangle]
-pub static mut sys_ptr: *mut Sys = ptr::null_mut();
+pub static mut sys_ptr: *mut Sys = KSYS as *mut Sys; // ptr::null_mut();
 
 pub static mut active: Active = Active::new();
 

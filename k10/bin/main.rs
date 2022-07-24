@@ -13,7 +13,7 @@ use k10::vsvm::vsvminit;
 use k10::{archhz, println};
 
 #[no_mangle]
-pub fn main(mbmagic: u32, pmbi: u32) {
+pub fn main(_: *mut Mach, mbmagic: u32, pmbi: u32) {
     let m = unsafe { &mut *m_ptr };
     let sys = unsafe { &mut *sys_ptr };
 
@@ -44,7 +44,8 @@ pub fn main(mbmagic: u32, pmbi: u32) {
     unsafe {
         ASM.init();
     };
-    multiboot(mbmagic, pmbi, false);
+
+    multiboot(mbmagic, pmbi, true);
     // options(oargc, oargv);
     // crapoptions();
 

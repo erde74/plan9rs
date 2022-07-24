@@ -1,12 +1,38 @@
-use crate::dat::{m_ptr, MIB};
+use crate::dat::{m_ptr, MiB, MACHSTKSZ, PGSZ, PTSZ};
 
-pub const KSEG0: usize = 0xffff_ffff_f000_0000; /* 256MB - this is confused */
-pub const KSEG1: usize = 0xffff_ff00_0000_0000; /* 512GB - embedded PML4 */
-pub const KSEG2: usize = 0xffff_fe00_0000_0000; /* 1TB - KMAP */
+pub const KZERO: usize = 0xffff_8000_0000_0000;
+pub const KTZERO: usize = KZERO + 2 * MiB;
+pub const KSYS: usize = KZERO + MiB + PGSZ;
 
-pub const KZERO: usize = 0xffff_ffff_f000_0000;
+/* Cr0 */
+pub const Pe: usize = 0x00000001; /* Protected Mode Enable */
+pub const Mp: usize = 0x00000002; /* Monitor Coprocessor */
+pub const Em: usize = 0x00000004; /* Emulate Coprocessor */
+pub const Ts: usize = 0x00000008; /* Task Switched */
+pub const Et: usize = 0x00000010; /* Extension Type */
+pub const Ne: usize = 0x00000020; /* Numeric Error  */
+pub const Wp: usize = 0x00010000; /* Write Protect */
+pub const Am: usize = 0x00040000; /* Alignment Mask */
+pub const Nw: usize = 0x20000000; /* Not Writethrough */
+pub const Cd: usize = 0x40000000; /* Cache Disable */
+pub const Pg: usize = 0x80000000; /* Paging Enable */
 
-pub const TMFM: usize = (256 - 32) * MIB; /* GAK kernel memory */
+/* Cr3 */
+pub const Pwt: usize = 0x00000008; /* Page-Level Writethrough */
+pub const Pcd: usize = 0x00000010; /* Page-Level Cache Disable */
+
+/* Cr4 */
+pub const Vme: usize = 0x00000001; /* Virtual-8086 Mode Extensions */
+pub const Pvi: usize = 0x00000002; /* Protected Mode Virtual Interrupts */
+pub const Tsd: usize = 0x00000004; /* Time-Stamp Disable */
+pub const De: usize = 0x00000008; /* Debugging Extensions */
+pub const Pse: usize = 0x00000010; /* Page-Size Extensions */
+pub const Pae: usize = 0x00000020; /* Physical Address Extension */
+pub const Mce: usize = 0x00000040; /* Machine Check Enable */
+pub const Pge: usize = 0x00000080; /* Page-Global Enable */
+pub const Pce: usize = 0x00000100; /* Performance Monitoring Counter Enable */
+pub const Osfxsr: usize = 0x00000200; /* FXSAVE/FXRSTOR Support */
+pub const Osxmmexcpt: usize = 0x00000400; /* Unmasked Exception Support */
 
 /* Rflags */
 pub const Cf: u32 = 0x00000001; /* Carry Flag */
@@ -44,6 +70,21 @@ pub const Lma: u64 = 0x00000400; /* Long Mode Active */
 pub const Nxe: u64 = 0x00000800; /* No-Execute Enable */
 pub const Svme: u64 = 0x00001000; /* SVM Extension Enable */
 pub const Ffxsr: u64 = 0x00004000; /* Fast FXSAVE/FXRSTOR */
+
+/* PML4E/PDPE/PDE/PTE */
+pub const PteP: usize = 0x0000000000000001; /* Present */
+pub const PteRW: usize = 0x0000000000000002; /* Read/Write */
+pub const PteU: usize = 0x0000000000000004; /* User/Supervisor */
+pub const PtePWT: usize = 0x0000000000000008; /* Page-Level Write Through */
+pub const PtePCD: usize = 0x0000000000000010; /* Page Level Cache Disable */
+pub const PteA: usize = 0x0000000000000020; /* Accessed */
+pub const PteD: usize = 0x0000000000000040; /* Dirty */
+pub const PtePS: usize = 0x0000000000000080; /* Page Size */
+pub const Pte4KPAT: usize = PtePS; /* PTE PAT */
+pub const PteG: usize = 0x0000000000000100; /* Global */
+pub const Pte2MPAT: usize = 0x0000000000001000; /* PDE PAT */
+pub const Pte1GPAT: usize = Pte2MPAT; /* PDPE PAT */
+pub const PteNX: usize = 0x8000000000000000; /* No Execute */
 
 /* Exceptions */
 
@@ -159,6 +200,33 @@ pub fn fastticks(hz: Option<&mut u64>) -> u64 {
     }
     return unsafe { rdtsc() };
 }
+
+core::arch::global_asm!(
+    include_str!("l.S"), 
+    KZERO=const KZERO, 
+    KSYS=const KSYS, 
+    KTZERO=const KTZERO, 
+    MACHSTKSZ=const MACHSTKSZ,
+    MiB=const MiB, 
+    PGSZ=const PGSZ,
+    Efer=const Efer,
+    Lme=const Lme,
+    Cd=const Cd,
+    Nw=const Nw,
+    Ts=const Ts,
+    Mp=const Mp,
+    Nxe=const Nxe,
+    Pe=const Pe,
+    Pg=const Pg,
+    Pae=const Pae,
+    Pge=const Pge,
+    Pse=const Pse,
+    PteRW=const PteRW,
+    PteP=const PteP,
+    PtePS=const PtePS,
+    PTSZ=const PTSZ,
+    Wp=const Wp,
+    options(att_syntax));
 
 pub mod asm;
 pub mod assembly;
