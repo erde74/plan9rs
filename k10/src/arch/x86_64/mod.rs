@@ -189,6 +189,10 @@ pub fn archhz() -> Option<u64> {
     None
 }
 
+pub fn coherence() {
+    unsafe { x86::fence::mfence() }
+}
+
 /*
  *  return value and speed of timer
  */

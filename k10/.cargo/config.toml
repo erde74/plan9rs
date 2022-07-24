@@ -1,6 +1,6 @@
 [build]
 target = "x86_64-unknown-none"
-rustflags = ['-Crelocation-model=pic', '-Clink-arg=-no-pie', '-Clink-arg=-z', '-Clink-arg=max-page-size=0x1000', '-Clink-arg=-Tsrc/arch/amd64/kernel.ld']
+rustflags = ['-Crelocation-model=pic', '-Clink-arg=-no-pie', '-Clink-arg=-z', '-Clink-arg=max-page-size=0x1000', '-Clink-arg=-Tsrc/arch/x86_64/kernel.ld']
 
 [unstable]
 build-std = ["core", "compiler_builtins"]

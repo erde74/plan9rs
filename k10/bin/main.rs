@@ -45,7 +45,7 @@ pub fn main(_: *mut Mach, mbmagic: u32, pmbi: u32) {
         ASM.init();
     };
 
-    multiboot(mbmagic, pmbi, true);
+    multiboot(mbmagic, pmbi, false);
     // options(oargc, oargv);
     // crapoptions();
 

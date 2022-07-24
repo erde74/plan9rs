@@ -1,10 +1,10 @@
 all:
-	cd src/arch/amd64/assembly && make
-	cp src/arch/amd64/assembly/libboot.a .
+	cd src/arch/x86_64/assembly && make
+	cp src/arch/x86_64/assembly/libboot.a .
 
 clean:
 	rm -fr image.iso libboot.a
-	cd src/arch/amd64/assembly && make clean
+	cd src/arch/x86_64/assembly && make clean
 
 iso: image.iso
 

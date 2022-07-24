@@ -1,4 +1,4 @@
-use crate::arch::amd64::KZERO;
+use crate::arch::x86_64::KZERO;
 use crate::getcallerpc;
 
 pub const fn kaddr(pa: usize) -> usize {
