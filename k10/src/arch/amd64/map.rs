@@ -1,20 +1,18 @@
-use crate::arch::amd64::{KSEG0, KSEG2, TMFM};
+use crate::arch::amd64::KZERO;
+use crate::getcallerpc;
 
 pub const fn kaddr(pa: usize) -> usize {
-    if pa < TMFM {
-        KSEG0 + pa
+    if pa < KZERO {
+        KZERO + pa
     } else {
-        KSEG2 + pa
+        pa
     }
 }
 
 pub fn paddr(pa: usize) -> usize {
-    if (KSEG0..KSEG0 + TMFM).contains(&pa) {
-        return pa - KSEG0;
+    if pa >= KZERO {
+        return pa - KZERO;
     }
 
-    if pa > KSEG2 {
-        return pa - KSEG2;
-    }
-    0
+    panic!("PADDR pa {:X} {:X}", pa, unsafe { getcallerpc(0) as usize });
 }
