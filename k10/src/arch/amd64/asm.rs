@@ -190,7 +190,7 @@ impl Asm {
             return 0;
         }
 
-        self.lock.ilock();
+        self.lock.lock();
 
         let mut pp: *mut AsmNode = ptr::null_mut();
         let mut ppp: &mut *mut AsmNode = &mut ASM.list.head;
@@ -213,7 +213,7 @@ impl Asm {
             || (!np.is_null() && addr + size > (*np).addr)
         {
             println!("asmfree: overlapp {} {:X} {:?}", size, addr, typ);
-            self.lock.iunlock();
+            self.lock.unlock();
             return -1;
         }
 
@@ -228,7 +228,7 @@ impl Asm {
                 self.freelist = np;
             }
 
-            self.lock.iunlock();
+            self.lock.unlock();
             return 0;
         }
 
@@ -236,20 +236,20 @@ impl Asm {
             (*np).addr -= size;
             (*np).size += size;
 
-            self.lock.iunlock();
+            self.lock.unlock();
             return 0;
         }
 
         pp = self.new_asm(addr, size, typ);
         if pp.is_null() {
-            self.lock.iunlock();
+            self.lock.unlock();
             return -1;
         }
 
         *ppp = pp;
         (*pp).next = np;
 
-        self.lock.iunlock();
+        self.lock.unlock();
         0
     }
 
@@ -354,7 +354,7 @@ impl Asm {
                  * for setting up allocators later.
                  */
 
-                if addr < 1 * MIB || addr + size < sys.syspage.fields.pmstart {
+                if addr < 1 * MiB || addr + size < sys.syspage.fields.pmstart {
                     return;
                 }
 
